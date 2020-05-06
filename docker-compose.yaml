@@ -1,0 +1,47 @@
+version: '3.8'
+services:
+    smartcodehub-api:
+      image:  smartcodehuborg/smartcodehub-api
+      build:
+        context: ./api
+        dockerfile: Dockerfile
+      networks:
+        - backend
+        - frontend 
+      command: npm run start:dev
+      depends_on:
+        - react-component-generator
+      ports:
+        - 8001:8001
+      deploy:
+        replicas: 2
+        update_config:
+          parallelism: 2
+          delay: 10s
+        restart_policy:
+          condition: on-failure
+        labels:
+          com.smartcodehub.api: "Smartcodehub web api service"
+
+    react-component-generator:
+      image:  smartcodehuborg/react-component-generator
+      build:
+        context: ./react-component-generator-v2
+        dockerfile: Dockerfile
+      networks:
+        - backend
+      command: npm run start:dev
+      ports:
+        - 8000:8000
+      deploy:
+        replicas: 2
+        update_config:
+          parallelism: 2
+          delay: 10s
+        restart_policy:
+          condition: on-failure
+        labels:
+          com.smartcodehub.react-component-generator: "Smartcodehub react component generator service"
+networks:
+  backend:
+  frontend: 
